@@ -1,0 +1,141 @@
+/* DirectoryStructure.css */
+
+.directory-container {
+    padding: 20px 0;
+}
+
+/* Container Heading */
+.container-heading {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 1em;
+    border-bottom: 1px solid #777;
+}
+
+.heading-left {
+    flex: 1;
+}
+
+.heading-right {
+    flex: 4;
+}
+
+.container-content {
+    display: flex;
+}
+
+.directory-list {
+    min-height: 100vh;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0;
+    border-right: 1px solid #ccc;
+    margin: 0;
+    flex-wrap: wrap;
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+  }
+  
+  .directory-item {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .directory-header {
+    cursor: pointer;
+    display: flex;
+    flex-basis: 100%;
+    margin: 0.7em;
+    align-items: center;
+  }
+  .directory-header span{
+    padding-left: 5px;
+  }
+  
+  .directory-item:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+  }
+  
+  .directory-item.selected {
+    background-color: #e0e0e0; /* Change background color for selected directory */
+  }
+  
+  
+  .directory-header:hover {
+    color: #007bff; /* Change text color on hover */
+  }
+  
+  .directory-header .fas {
+    margin-right: 5px;
+  }
+  .sub-directory-list {
+    padding-left: 20px;
+    flex-basis: 100%;
+  }
+  
+  .sub-directory-item {
+    margin-bottom: 5px;
+    cursor: default;
+  }
+  
+  .directory-file-item {
+    margin-left: 20px; /* Indent file items */
+  }
+
+
+/* File Section */
+  
+  .file-list {
+    flex: 4;
+    align-items: flex-start;
+    padding: 10px;
+    list-style-type: none;
+    gap: 2em;
+    display: flex;
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+  }
+  
+  .file-item {
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .file-directory-icon{
+    width: 200px;
+    height: 140px;
+    position: relative;
+    background-color: #cac6c6;
+    cursor: pointer;
+  }
+
+  .file-directory-icon *{
+    height: 65px;
+    width: 65px;
+    position: absolute;
+    left: 31%;
+    top: 25%;
+  }
+  
+  .file-item:hover {
+    /* transform: translateY(-5px); Move file item up slightly on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add more shadow on hover */
+  }
+  
+.file-item-image {
+    width: 300px;
+    padding: 5px;
+    height: 200px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+
+/* DirectoryStructure.css */
+
+  

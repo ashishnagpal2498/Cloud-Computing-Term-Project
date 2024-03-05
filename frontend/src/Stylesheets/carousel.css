@@ -1,0 +1,68 @@
+.carousel-container {
+    position: relative;
+    width: 100%;
+    margin-top: 2em;
+    overflow: hidden;
+  }
+
+  .carousel-text{
+    display: flex;
+  }
+
+  .carousel-text *{
+    padding: 5px 1.5em;
+  }
+  
+  .carousel-heading{
+    font-size: 30px;
+    flex: 1;
+  }
+
+  .carousel-desc{
+    flex: 2;
+    padding-right: 5em;
+  }
+
+  .carousel {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: 1em;
+  }
+  
+  .carousel-item {
+    flex: 0 0 500px; /* Maximum size of 300px for each item */
+    height: 350px; /* Add some spacing between items */
+  }
+  
+  .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image fills the square container */
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .slide-in {
+    animation: slideIn 0.5s forwards;
+  }
+  
+  .slide-out {
+    animation: slideOut 0.5s forwards;
+  }
+  

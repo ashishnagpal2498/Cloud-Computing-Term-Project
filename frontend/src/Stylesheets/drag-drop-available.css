@@ -1,0 +1,36 @@
+.drag-drop-av-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3em;
+    background-color: lightyellow;
+}
+
+.feature-existence {
+    flex: 1;
+    justify-content: center;
+    display: flex;
+}
+
+.drop-zone {
+    max-width: 200px;
+    height: 200px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Quicksand", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    cursor: pointer;
+    color: #cccccc;
+    border: 4px dashed #009578;
+    border-radius: 10px;
+  }
+
+.drag-drop-heading{
+    flex: 1;
+    font-size: 2em;
+    text-shadow: 3px;
+}
