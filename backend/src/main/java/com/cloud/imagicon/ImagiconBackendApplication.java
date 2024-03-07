@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ImagiconBackendApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(ImagiconBackendApplication.class, args);
 	}
 
