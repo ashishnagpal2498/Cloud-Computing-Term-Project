@@ -16,6 +16,7 @@ const ImageGallery = ({image}) => {
     // Implement download logic here
   };
 
+  console.log(image);
   return (
     <>
       <img className='file-item-image' src={image.url} alt={image.name} onClick={() => openModal(image.url)} />

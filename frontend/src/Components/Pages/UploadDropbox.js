@@ -1,6 +1,8 @@
 // App.js
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import axios from 'axios'
+import ImageGallery from '../Layouts/Image-Gallery/ImageGallery';
 
 const DropBox = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
@@ -16,30 +18,17 @@ const DropBox = ({ onDrop }) => {
 const UploadDropBox = () => {
   const [images, setImages] = useState([]);
 
-  const onDrop = (acceptedFiles) => {
     const onDrop = (acceptedFiles) => {
-        // Create an array to hold the image files from all folders
+      console.log("Files dropped")
         let imageFiles = [];
-      
-        // Iterate through each dropped folder
-        acceptedFiles.forEach(folder => {
-          // Check if the dropped item is a directory (folder)
-          if (folder.isDirectory) {
-            // Iterate through each file in the folder
-            folder.createReader().readEntries(entries => {
-              entries.forEach(entry => {
-                // Check if the entry is a file and has an image MIME type
-                if (entry.isFile && entry.type.startsWith('image/')) {
-                  // Add the image file to the array
+        console.log(acceptedFiles)
+              acceptedFiles.forEach(entry => {
+                if (entry.type.startsWith('image/')) {
+                  console.log(entry)
                   imageFiles.push(entry);
                 }
-              });
-              // Update state with the collected image files
-              setImages(prevImages => [...prevImages, ...imageFiles]);
-            });
-          }
-        });
-      };      
+        }); 
+        setImages(imageFiles);
   };
 
   const dropzoneStyle = {
@@ -57,17 +46,52 @@ const UploadDropBox = () => {
     outline: 'none',
     transition: 'border .24s ease-in-out'
   }
+
+  const uploadFolder = async () => {
+    console.log("Upload Button Clicked")
+    console.log(images);
+    const formData = new FormData();
+
+  // Append each image file to the formData
+  images.forEach((file) => {
+    formData.append(`files`, file);
+  });
+
+  // Make a POST request to the server
+  try{
+    const response = await axios.post('http://localhost:8080/uploadBulk', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    if(response.status === 200){
+        console.log('Upload successful:', response);
+        // Optionally, you can handle success response here
+    }
+  }
+  catch (error ){
+      console.error('Error uploading images:', error);
+  }
+  }
   return (
     <div >
       <h1>Custom Drag and Drop Box</h1>
       <DropBox style={dropzoneStyle} onDrop={onDrop} />
       <div className="image-list">
-        {images.map((file, index) => (
-          <div key={index} className="image-item">
-            <img src={URL.createObjectURL(file)} alt={`Image ${index}`} />
-          </div>
-        ))}
+      {images.length > 0 && <h4> Preview Images </h4> }
+      <ul className="file-list">
+                    {images.map((file, index) => (
+                        <li key={index} className="file-item">
+                            <ImageGallery image={ {
+                              url: URL.createObjectURL(file),
+                              name: "val" + index
+                            }}/>
+                            
+                        </li>
+          ))}
+        </ul>
       </div>
+      <button onClick={uploadFolder}>Upload</button>
     </div>
   );
 };
