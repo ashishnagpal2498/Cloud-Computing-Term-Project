@@ -1,5 +1,6 @@
 package com.cloud.imagicon.controller;
 
+import com.cloud.imagicon.DTO.UserSearchDTO;
 import com.cloud.imagicon.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,15 @@ public class ImageController {
     @Autowired
     private ImageService imageService;
 
-    @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        return imageService.uploadImage(file);
+    @PostMapping("/searchImage")
+    public ResponseEntity<UserSearchDTO> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        UserSearchDTO s3UrlsResponse = imageService.searchUser(file);
+        return ResponseEntity.ok(s3UrlsResponse);
     }
+    @PostMapping("/uploadBulk")
+    public ResponseEntity<String> uploadFiles(@RequestParam("files") MultipartFile[] files) throws IOException {
 
-    @GetMapping("/image/{id}")
-    public ResponseEntity<String> getImageUrlById(@PathVariable Long id) {
-        String imageUrl = imageService.getImageUrlById(id);
-        return ResponseEntity.ok(imageUrl);
+        String result = imageService.uploadImageFolder(files);
+        return ResponseEntity.ok(result);
     }
 }
