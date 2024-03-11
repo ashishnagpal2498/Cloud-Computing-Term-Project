@@ -18,17 +18,17 @@ const DropBox = ({ onDrop }) => {
 const UploadDropBox = () => {
   const [images, setImages] = useState([]);
 
-    const onDrop = (acceptedFiles) => {
-      console.log("Files dropped")
-        let imageFiles = [];
-        console.log(acceptedFiles)
-              acceptedFiles.forEach(entry => {
-                if (entry.type.startsWith('image/')) {
-                  console.log(entry)
-                  imageFiles.push(entry);
-                }
-        }); 
-        setImages(imageFiles);
+  const onDrop = (acceptedFiles) => {
+    console.log("Files dropped")
+    let imageFiles = [];
+    console.log(acceptedFiles)
+    acceptedFiles.forEach(entry => {
+      if (entry.type.startsWith('image/')) {
+        console.log(entry)
+        imageFiles.push(entry);
+      }
+    });
+    setImages(imageFiles);
   };
 
   const dropzoneStyle = {
@@ -52,46 +52,76 @@ const UploadDropBox = () => {
     console.log(images);
     const formData = new FormData();
 
-  // Append each image file to the formData
-  images.forEach((file) => {
-    formData.append(`files`, file);
-  });
+    // Append each image file to the formData
+    images.forEach((file) => {
+      formData.append(`files`, file);
+    });
 
-  // Make a POST request to the server
-  try{
-    const response = await axios.post('http://localhost:8080/uploadBulk', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    if(response.status === 200){
+    // Make a POST request to the server
+    try {
+      const response = await axios.post('http://localhost:8080/uploadBulk', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      if (response.status === 200) {
         console.log('Upload successful:', response);
         // Optionally, you can handle success response here
+      }
+    }
+    catch (error) {
+      console.error('Error uploading images:', error);
     }
   }
-  catch (error ){
+
+  const searchFaces = async () => {
+    console.log("Search Faces Button Clicked")
+    console.log(images);
+    const formData = new FormData();
+
+    // Append each image file to the formData
+      formData.append(`file`, images[0]);
+
+    // Make a POST request to the server
+    try {
+      const response = await axios.post('http://localhost:8080/searchImage', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      if (response.status === 200) {
+        console.log('Search successful:', response);
+        setImages(response.data.images)
+      }
+    }
+    catch (error) {
       console.error('Error uploading images:', error);
-  }
+    }
   }
   return (
     <div >
       <h1>Custom Drag and Drop Box</h1>
       <DropBox style={dropzoneStyle} onDrop={onDrop} />
       <div className="image-list">
-      {images.length > 0 && <h4> Preview Images </h4> }
-      <ul className="file-list">
-                    {images.map((file, index) => (
-                        <li key={index} className="file-item">
-                            <ImageGallery image={ {
-                              url: URL.createObjectURL(file),
-                              name: "val" + index
-                            }}/>
-                            
-                        </li>
+        {images.length > 0 && <h4> Preview Images </h4>}
+        <ul className="file-list">
+          {images.map((value, index) => (
+            <li key={index} className="file-item">
+              {/* <ImageGallery image={{
+                url: URL.createObjectURL(file),
+                name: "val" + index
+              }} /> */}
+
+              <ImageGallery image={{
+                url: value,
+                name: "val" + index
+              }} />
+
+            </li>
           ))}
         </ul>
       </div>
-      <button onClick={uploadFolder}>Upload</button>
+      <button onClick={searchFaces}>Search Pictures</button>
     </div>
   );
 };
