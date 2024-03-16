@@ -1,5 +1,6 @@
 package com.cloud.imagicon.controller;
 
+import com.cloud.imagicon.DTO.UploadCollectionDTO;
 import com.cloud.imagicon.DTO.UserSearchDTO;
 import com.cloud.imagicon.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,11 @@ public class ImageController {
         return ResponseEntity.ok(s3UrlsResponse);
     }
     @PostMapping("/uploadBulk")
-    public ResponseEntity<String> uploadFiles(@RequestParam("files") MultipartFile[] files) throws IOException {
+    public ResponseEntity<UploadCollectionDTO> uploadFiles(@RequestParam("files") MultipartFile[] files) throws IOException {
 
-        String result = imageService.uploadImageFolder(files);
+        String collectionName = imageService.uploadImageFolder(files);
+        UploadCollectionDTO result = new UploadCollectionDTO();
+        result.setCollectionName(collectionName);
         return ResponseEntity.ok(result);
     }
 }

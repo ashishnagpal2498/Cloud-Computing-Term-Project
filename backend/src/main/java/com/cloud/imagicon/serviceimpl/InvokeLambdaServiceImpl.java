@@ -38,9 +38,19 @@ public class InvokeLambdaServiceImpl implements InvokeLambdaService {
        InvokeResult invokeResult = awsLambda.invoke(invokeRequest);
 
        if (invokeResult.getStatusCode() == 200) {
-           System.out.println("Lambda Invoked Successful");
-           return new String(invokeResult.getPayload().array());
-       } else {
+           try {
+               // Parse Lambda response
+               JsonNode rootNode = objectMapper.readTree(invokeResult.getPayload().array());
+               String body = rootNode.get("body").asText();
+               JsonNode bodyNode = objectMapper.readTree(body);
+
+               // Return the collection name
+               return bodyNode.get("collectionName").asText();
+           } catch (Exception e) {
+               throw new RuntimeException("Error parsing Lambda response.", e);
+           }
+       }
+           else {
            throw new RuntimeException("Error invoking Lambda function. Status code: " + invokeResult.getStatusCode());
        }
    }

@@ -22,9 +22,6 @@ public class HelperDTO {
 
         private int statusCode;
         private String body;
-
-
-        // Getter and setter methods
     }
 
     public static class Face {

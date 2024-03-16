@@ -49,12 +49,13 @@ public class ImageServiceImpl implements ImageService {
                 amazonS3.putObject(new PutObjectRequest("cloud-media-upload-1", key, file.getInputStream(), null)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             }
-            String value = lambdaFunction.createCollectionIndexes("ashishnagpal","cloud-media-upload-1", "images/ash/");
-            System.out.println(value);
+            String collectionName = lambdaFunction.createCollectionIndexes("ashishnagpal","cloud-media-upload-1", "images/ash/");
+            System.out.println(collectionName);
+            return collectionName;
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to upload files.";
         }
-        return "avc";
+
     }
 }
