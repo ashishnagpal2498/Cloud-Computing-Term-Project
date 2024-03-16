@@ -17,7 +17,9 @@ export const Navigation = () => {
               <li><Link to="/">Home</Link></li>
               <li><Link to="/directory">Directory</Link></li>
               <li><Link to="/upload">Upload</Link></li>
+              <li><Link to="/friends">Friends</Link></li>
               <li><Link to="/aboutus">About Us</Link></li>
+              
             </ul>
             <ul className="menu menu-auth">
               <li><a href="/login">Login</a></li>

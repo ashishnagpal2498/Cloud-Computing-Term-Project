@@ -3,6 +3,9 @@ import { Route, BrowserRouter as Router, Routes,/* Navigate*/ } from 'react-rout
 import Directory from "./Components/Pages/Directory";
 import UploadDropBox from "./Components/Pages/UploadDropbox";
 import HomePage from "./Components/Pages/HomePage";
+import ViewImages from "./Components/Pages/ViewImages";
+import FriendsList from "./Components/Pages/FriendsList";
+import FriendsListDetail from "./Components/Pages/FriendsListDetail";
 
 
 const App = () => {
@@ -13,10 +16,13 @@ const App = () => {
       <Navigation />
 
         <Routes>
-          <Route path="/" element={<HomePage />} />
           <Route path="/directory" element={<Directory />} />
-          <Route path="/aboutus" element={()=> <div>Coming Soon</div>} />
+          <Route path="/aboutus" element={()=> <p>Coming Soon</p>} />
           <Route path="/upload" element={<UploadDropBox />} />
+          <Route path="/view/:collectionName" element={<ViewImages/>} />
+          <Route path="/friends" element={<FriendsList />} />
+          <Route path="/friends/:listName" element={<FriendsListDetail />} />
+          <Route path="/" element={<HomePage />} />
         </Routes>
 
     </div>

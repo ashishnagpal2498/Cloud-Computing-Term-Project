@@ -66,7 +66,7 @@ const UploadDropBox = () => {
       })
       if (response.status === 200) {
         console.log('Upload successful:', response);
-        // Optionally, you can handle success response here
+        alert("Your can view your images using the link - http://localhost:3000/view/" + response.data.collectionName);
       }
     }
     catch (error) {
@@ -74,30 +74,6 @@ const UploadDropBox = () => {
     }
   }
 
-  const searchFaces = async () => {
-    console.log("Search Faces Button Clicked")
-    console.log(images);
-    const formData = new FormData();
-
-    // Append each image file to the formData
-      formData.append(`file`, images[0]);
-
-    // Make a POST request to the server
-    try {
-      const response = await axios.post('http://localhost:8080/searchImage', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      if (response.status === 200) {
-        console.log('Search successful:', response);
-        setImages(response.data.images)
-      }
-    }
-    catch (error) {
-      console.error('Error uploading images:', error);
-    }
-  }
   return (
     <div >
       <h1>Custom Drag and Drop Box</h1>
@@ -121,7 +97,7 @@ const UploadDropBox = () => {
           ))}
         </ul>
       </div>
-      <button onClick={searchFaces}>Search Pictures</button>
+      <button onClick={uploadFolder}>Upload Folder</button>
     </div>
   );
 };
