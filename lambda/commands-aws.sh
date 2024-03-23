@@ -1,9 +1,9 @@
-aws rekognition list-faces --collection-id "user-collection"  
+aws rekognition list-faces --collection-id "ashishnagpal-collection"  
 
 aws rekognition search-faces-by-image --image '{"S3Object":{"Bucket":"cloud-media-upload-1","Name":"images/profileimg.jpg"}}' \
 --collection-id "user-collection"
 
-aws rekognition delete-collection --collection-id "user-collection"
+aws rekognition delete-collection --collection-id "ashishnagpal-collection"
 
 aws rekognition search-faces-by-image --image '{"S3Object":{"Bucket":"cloud-media-upload-1","Name":"images/profileimg.jpg"}}' \
 --collection-id "ashishnagpal-collection"

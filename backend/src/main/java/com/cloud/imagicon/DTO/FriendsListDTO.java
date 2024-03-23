@@ -18,10 +18,21 @@ public class FriendsListDTO {
         isSubscribed = subscribed;
     }
 
-    public FriendsListDTO(String email, boolean isSubscribed){
+    public FriendsListDTO(String email, boolean isSubscribed, String subscriptionArn){
         this.emailAddress = email;
         this.isSubscribed = isSubscribed;
+        this.subscriptionArn = subscriptionArn;
     }
     private String emailAddress;
     private boolean isSubscribed;
+
+    public String getSubscriptionArn() {
+        return subscriptionArn;
+    }
+
+    public void setSubscriptionArn(String subscriptionArn) {
+        this.subscriptionArn = subscriptionArn;
+    }
+
+    private String subscriptionArn;
 }

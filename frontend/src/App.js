@@ -6,6 +6,7 @@ import HomePage from "./Components/Pages/HomePage";
 import ViewImages from "./Components/Pages/ViewImages";
 import FriendsList from "./Components/Pages/FriendsList";
 import FriendsListDetail from "./Components/Pages/FriendsListDetail";
+import Collections from "./Components/Pages/Collections";
 
 
 const App = () => {
@@ -16,8 +17,9 @@ const App = () => {
       <Navigation />
 
         <Routes>
-          <Route path="/directory" element={<Directory />} />
+          {/* <Route path="/directory" element={<Directory />} /> */}
           <Route path="/aboutus" element={()=> <p>Coming Soon</p>} />
+          <Route path="/collections" element={<Collections />} />
           <Route path="/upload" element={<UploadDropBox />} />
           <Route path="/view/:collectionName" element={<ViewImages/>} />
           <Route path="/friends" element={<FriendsList />} />

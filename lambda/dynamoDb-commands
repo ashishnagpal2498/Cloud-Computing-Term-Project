@@ -1,0 +1,6 @@
+aws dynamodb get-item --table-name "user-images" --key "rekognitionCollectionId" --return-consumed-capacity TOTAL
+aws dynamodb get-item --table-name "user-images" --key '{"rekognitionCollectionId": {"S": "ashishnagpal-collection"}}'
+
+
+
+aws sns list-subscriptions-by-topic --topic-arn arn:aws:sns:us-east-1:992382575885:NewTopic

@@ -11,19 +11,19 @@ export const Navigation = () => {
   
   return (
         <nav className="top-nav">
-          <div className="logo">Logo</div>
+          <div className="logo">Imagicon</div>
           <div className={`nav-options ${menuOpen ? 'open' : ''}`}>
             <ul className="menu">
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/directory">Directory</Link></li>
+              {/* <li><Link to="/directory">Directory</Link></li> */}
               <li><Link to="/upload">Upload</Link></li>
               <li><Link to="/friends">Friends</Link></li>
-              <li><Link to="/aboutus">About Us</Link></li>
+              <li><Link to="/collections">Collections</Link></li>
               
             </ul>
             <ul className="menu menu-auth">
-              <li><a href="/login">Login</a></li>
-              <li><a href="/signup">SignUp</a></li>
+              {/* <li><a href="/login">Login</a></li>
+              <li><a href="/signup">SignUp</a></li> */}
             </ul>
             <button className={`cross-btn ${menuOpen ? 'open' : ''}`} onClick={toggleMenu}>&#x2715;</button>
           </div>

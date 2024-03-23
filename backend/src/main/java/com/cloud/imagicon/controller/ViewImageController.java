@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class ViewImageController {
 
@@ -23,5 +26,12 @@ public class ViewImageController {
         } else {
             return ResponseEntity.notFound().build(); // Return 404 Not Found if collection does not exist
         }
+    }
+
+    @GetMapping("/collections")
+    public ResponseEntity<List<String>> viewCollections(){
+        List<String> result = new ArrayList<>();
+        result.add("ashishnagpal-collection");
+        return ResponseEntity.ok(result);
     }
 }

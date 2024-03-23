@@ -70,6 +70,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>backend-imagicon</finalName>
 	</build>
 
 </project>

@@ -17,11 +17,13 @@ def lambda_handler(event,context):
 
     addUser(username)
     collectionId = username + '-collection'
-    # create_rekognition_collection(collectionId)
+    create_rekognition_collection(collectionId)
     s3Images = s3.list_objects_v2(Bucket=s3BucketName, Prefix=s3FolderPrefix)
-
+    print("S3-Images----->")
+    print(s3Images)
     for obj in s3Images.get('Contents', []):
         object_key = obj['Key']
+        print("Inside for loop with object_key --> ", object_key)
         
         if not object_key.lower().endswith(('.png', '.jpg', '.jpeg')):
             continue
@@ -32,16 +34,16 @@ def lambda_handler(event,context):
             print(response)
             if response['ResponseMetadata']['HTTPStatusCode'] == 200:
                 print("External" + response['FaceRecords'][0]['Face']['ExternalImageId'] )
-            
-            return build_response(200,{
-                "message": "success",
-            })
                 
         except Exception as e:
             print("Error in rekognition index creation")
             print(e)
             return build_response(500,{
                 "message": "Internal Error in Lambda function"
+            })
+    return build_response(200,{
+        "message": "success",
+        "collectionName": collectionId
             })
 
 def index_user_images(bucket,key,collectionId):
@@ -67,6 +69,10 @@ def addUser(username):
     )
 
 def create_rekognition_collection(collectionId):
+    collectionExist = rekognition.describe_collection(CollectionId=collectionId)
+    if(collectionExist):
+        print("CollectionARn --> ", collectionExist['CollectionARN'])
+        return
     response = rekognition.create_collection(CollectionId=collectionId)
     print('Collection ARN: ' + response['CollectionArn'])
 

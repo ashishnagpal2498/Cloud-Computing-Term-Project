@@ -22,9 +22,8 @@ public class CollectionServiceImpl implements CollectionService {
             Table table = dynamoDB.getTable(dynamoDbTableName);
             System.out.println("CollectionName --> "+ collectionName);
             System.out.println("TableName  --> " + dynamoDbTableName);
-            Item item = table.getItem("rekognitionCollectionId", collectionName);
-
-            return item != null; // If the result contains an item, collection exists
+            Item item = table.getItem("username", "ashishnagpal");
+            return item != null && item.get("rekognitionCollectionId").equals(collectionName);// If the result contains an item, collection exists
         } catch (Exception e) {
             throw new RuntimeException("Error checking DynamoDB table: " + e.getMessage(), e);
         }

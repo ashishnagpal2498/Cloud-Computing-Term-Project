@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Button, TextField, List, ListItem, ListItemText, IconButton, Snackbar, Typography, Grid, Divider } from '@mui/material';
+import { Alert } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import { green, red, yellow } from '@mui/material/colors';
 
 const FriendsList = () => {
   const [listTitles, setListTitles] = useState([]);
@@ -8,17 +13,17 @@ const FriendsList = () => {
   const [showForm, setShowForm] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const [emailAddresses, setEmailAddresses] = useState(['']);
-
+  const [successMessage, setSuccessMessage] = useState('');
+  const fetchListTitles = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/friends-list/');
+      setListTitles(response.data);
+    } catch (error) {
+      setError('Error fetching list titles');
+    }
+  };
   useEffect(() => {
-    const fetchListTitles = async () => {
-      try {
-        // const response = await axios.get('http://localhost:8080/friends-list/titles');
-        // setListTitles(response.data);
-        setListTitles(["ashishnagpal-random", "shreyakapoor-trip"])
-      } catch (error) {
-        setError('Error fetching list titles');
-      }
-    };
+
 
     fetchListTitles();
   }, []);
@@ -43,64 +48,97 @@ const FriendsList = () => {
     e.preventDefault();
 
     try {
-      // Send a POST request to create a new friends list
       const response = await axios.post('http://localhost:8080/friends-list/create', {
         snsTopicName: newListTitle,
-        emailAddresses: emailAddresses.filter(email => email.trim() !== '') // Remove empty email addresses
+        emailAddresses: emailAddresses.filter(email => email.trim() !== '')
       });
-      
-      // Handle success, for example, show a success message or redirect to the newly created list
-      console.log('New list created:', response.data);
 
-      // Clear form fields
+      setSuccessMessage('New list created successfully');
+      setShowForm(false);
       setNewListTitle('');
       setEmailAddresses(['']);
+      fetchListTitles();
     } catch (error) {
       setError('Error creating new friends list');
     }
   };
+  const handleDeleteList = async (title) => {
+    try {
+      await axios.delete(`http://localhost:8080/friends-list/${title}`);
+      setListTitles(listTitles.filter(item => item !== title));
+    } catch (error) {
+      setError('Error deleting list');
+    }
+  };
+  const handleSnackbarClose = () => {
+    setError(null);
+    setSuccessMessage('');
+  };
 
   return (
     <div>
-      <h2>Friends Lists</h2>
+      <Typography variant="h4" gutterBottom>Friends Lists</Typography>
 
-      {error && <p>{error}</p>}
-
-      <ul>
+      <List>
         {listTitles.map((title, index) => (
-          <li key={index}>
-            <Link to={`/friends/${title}`}>{title}</Link>
-          </li>
+          <div key={index}>
+            <ListItem>
+              <ListItemText primary={<Link to={`/friends/${title}`} style={{ textDecoration: 'none' }}>{title}</Link>} />
+              <IconButton style={{ color: red[500] }} edge="end" aria-label="delete" onClick={() => handleDeleteList(title)}>
+                <DeleteIcon />
+              </IconButton>
+            </ListItem>
+            <Divider />
+          </div>
         ))}
-      </ul>
+      </List>
 
-      <button onClick={() => setShowForm(true)}>Add New List</button>
+      <Button variant="contained" startIcon={<AddIcon />} onClick={() => setShowForm(!showForm)}>{showForm ? "Close form" : "Create New List"}</Button>
 
       {showForm && (
         <form onSubmit={handleSubmit}>
-          <input 
-            type="text" 
-            placeholder="Enter List Title" 
-            value={newListTitle} 
-            onChange={(e) => setNewListTitle(e.target.value)} 
+          <TextField
+            fullWidth
+            margin="normal"
+            label="List Title"
+            variant="outlined"
+            value={newListTitle}
+            onChange={(e) => setNewListTitle(e.target.value)}
           />
 
           {emailAddresses.map((email, index) => (
-            <div key={index}>
-              <input 
-                type="email" 
-                placeholder="Enter Email Address" 
-                value={email} 
-                onChange={(e) => handleInputChange(index, e.target.value)} 
-              />
-              {index > 0 && <button type="button" onClick={() => handleRemoveEmailField(index)}>Remove</button>}
-            </div>
+            <Grid container spacing={2} key={index}>
+              <Grid item xs={9}>
+                <TextField
+                  fullWidth
+                  type="email"
+                  label="Enter Email Address"
+                  value={email}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={3}>
+                {index > 0 && (
+                  <IconButton aria-label="remove" onClick={() => handleRemoveEmailField(index)}>
+                    <DeleteIcon style={{ color: red[500] }} />
+                  </IconButton>
+                )}
+              </Grid>
+            </Grid>
           ))}
 
-          <button type="button" onClick={handleAddEmailField}>Add More</button>
-          <button type="submit">Create List</button>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddEmailField} style={{ backgroundColor: green[500], margin: "10px 20px" }}>Add Email</Button>
+          <Button type="submit" variant="contained">Create List</Button>
         </form>
       )}
+
+      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert severity="error" onClose={handleSnackbarClose}>{error}</Alert>
+      </Snackbar>
+
+      <Snackbar open={Boolean(successMessage)} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert severity="success" onClose={handleSnackbarClose}>{successMessage}</Alert>
+      </Snackbar>
     </div>
   );
 };

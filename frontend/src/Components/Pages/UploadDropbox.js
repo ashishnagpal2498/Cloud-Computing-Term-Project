@@ -1,8 +1,10 @@
-// App.js
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios'
+import axios from 'axios';
 import ImageGallery from '../Layouts/Image-Gallery/ImageGallery';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import '../../Stylesheets/dropbox.css'; // Add your custom CSS for styling
 
 const DropBox = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
@@ -10,6 +12,7 @@ const DropBox = ({ onDrop }) => {
   return (
     <div {...getRootProps()} className="drop-box">
       <input {...getInputProps()} />
+      <CloudUploadIcon sx={{ fontSize: 40 }} />
       <p>Drag 'n' drop some folders containing images here, or click to select folders</p>
     </div>
   );
@@ -17,87 +20,113 @@ const DropBox = ({ onDrop }) => {
 
 const UploadDropBox = () => {
   const [images, setImages] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [friendsList, setFriendsList] = useState([]);
+  const [selectedList, setSelectedList] = useState('');
+  const [collectionId, setCollectionId] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const onDrop = (acceptedFiles) => {
-    console.log("Files dropped")
     let imageFiles = [];
-    console.log(acceptedFiles)
     acceptedFiles.forEach(entry => {
       if (entry.type.startsWith('image/')) {
-        console.log(entry)
         imageFiles.push(entry);
       }
     });
     setImages(imageFiles);
   };
 
-  const dropzoneStyle = {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
-    borderWidth: 2,
-    borderRadius: 2,
-    borderColor: '#eeeeee',
-    borderStyle: 'dashed',
-    backgroundColor: '#fafafa',
-    color: '#bdbdbd',
-    outline: 'none',
-    transition: 'border .24s ease-in-out'
-  }
-
   const uploadFolder = async () => {
-    console.log("Upload Button Clicked")
-    console.log(images);
+    setUploading(true); // Show loader
     const formData = new FormData();
-
-    // Append each image file to the formData
     images.forEach((file) => {
       formData.append(`files`, file);
     });
 
-    // Make a POST request to the server
     try {
       const response = await axios.post('http://localhost:8080/uploadBulk', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-      })
+      });
       if (response.status === 200) {
         console.log('Upload successful:', response);
-        alert("Your can view your images using the link - http://localhost:3000/view/" + response.data.collectionName);
+        setOpen(true);
+        setCollectionId(response.data.collectionName)
+        fetchFriendsList();
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error uploading images:', error);
+    } finally {
+      setUploading(false); // Hide loader
     }
-  }
+  };
+
+  const fetchFriendsList = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/friends-list/');
+      setFriendsList(response.data);
+    } catch (error) {
+      console.error('Error fetching friends list:', error);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleShare = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/friends-list/publishMessage', {
+        collectionId,
+        snsTopicName: selectedList
+      });
+      console.log('Share successful:', response);
+      setOpen(false);
+    } catch (error) {
+      console.error('Error sharing images:', error);
+    }
+  };
 
   return (
-    <div >
-      <h1>Custom Drag and Drop Box</h1>
-      <DropBox style={dropzoneStyle} onDrop={onDrop} />
+    <div>
+      <h1>Add your album</h1>
+      <DropBox onDrop={onDrop} />
       <div className="image-list">
         {images.length > 0 && <h4> Preview Images </h4>}
         <ul className="file-list">
           {images.map((value, index) => (
             <li key={index} className="file-item">
-              {/* <ImageGallery image={{
-                url: URL.createObjectURL(file),
-                name: "val" + index
-              }} /> */}
-
               <ImageGallery image={{
-                url: value,
+                url: URL.createObjectURL(value),
                 name: "val" + index
               }} />
-
             </li>
           ))}
         </ul>
       </div>
-      <button onClick={uploadFolder}>Upload Folder</button>
+      <Button onClick={uploadFolder} variant="contained" startIcon={<CloudUploadIcon />}>
+        {uploading ? <CircularProgress size={24} color="inherit" /> : 'Upload Folder'}
+      </Button>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Share with Friends</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Select a friend list to share these images:
+          </DialogContentText>
+          <select value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
+            <option value="">Select a list</option>
+            {friendsList.map((list, index) => (
+              <option key={index} value={list}>{list}</option>
+            ))}
+          </select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleShare} disabled={!selectedList}>Share</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
