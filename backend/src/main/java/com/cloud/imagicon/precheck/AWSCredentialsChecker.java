@@ -1,6 +1,7 @@
 package com.cloud.imagicon.precheck;
 
 import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,22 +14,22 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Component
 public class AWSCredentialsChecker implements ApplicationRunner {
 
-    @Value("${aws.accessKeyId}")
-    private String accessKey;
-
-    @Value("${aws.secretKey}")
-    private String secretKey;
-
-    @Value("${aws.sessionToken}")
-    private String sessionToken;
+//    @Value("${aws.accessKeyId}")
+//    private String accessKey;
+//
+//    @Value("${aws.secretKey}")
+//    private String secretKey;
+//
+//    @Value("${aws.sessionToken}")
+//    private String sessionToken;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Perform the AWS credentials validation here
         try {
-            BasicSessionCredentials awsCredentials = new BasicSessionCredentials(accessKey, secretKey, sessionToken);
+//            BasicSessionCredentials awsCredentials = new BasicSessionCredentials(accessKey, secretKey, sessionToken);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                    .withCredentials(new DefaultAWSCredentialsProviderChain())
                     .build();
 
             s3Client.listBuckets();

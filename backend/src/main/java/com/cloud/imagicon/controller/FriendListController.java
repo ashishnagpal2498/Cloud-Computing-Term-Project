@@ -5,6 +5,7 @@ import com.cloud.imagicon.DTO.PublishToFriendsDTO;
 import com.cloud.imagicon.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
+
 @RequestMapping("/friends-list")
 public class FriendListController {
 
@@ -25,10 +28,15 @@ public class FriendListController {
     @Value("${aws.accountId}")
     String awsAccountId;
 
+    @Value("${frontendURL}")
+    String frontendURL;
+
     @GetMapping("/")
     public ResponseEntity<List< String > > getFriendsList(){
         List<String> result = snsService.getFriendsList();
+        System.out.println("FRONTENDURL --> " + frontendURL );
         return ResponseEntity.ok(result);
+
     }
     @PostMapping("/create")
     public ResponseEntity<String> createSubscriptions(@RequestBody FriendsDTO friends) {
@@ -74,9 +82,9 @@ public class FriendListController {
         try {
 
             String message = "Hello,\n\n" +
-                    "Your friend has added photos to this link - http://localhost:3000/view/" + publishMessage.getCollectionId() +
+                    "Your friend has added photos to this link - http://" + frontendURL + "/view/" + publishMessage.getCollectionId() +
                     ". Use the link to get your photos from the album";
-
+            System.out.println("FrontendURL ----> " + frontendURL);
             // Publish message to the SNS topic
             String result = snsService.publishPhotoURLToFriends(publishMessage.getSnsTopicName(), message);
 

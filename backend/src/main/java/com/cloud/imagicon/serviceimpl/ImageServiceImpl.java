@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.cloud.imagicon.DTO.UserSearchDTO;
 import com.cloud.imagicon.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -22,22 +23,26 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private  InvokeLambdaServiceImpl lambdaFunction;
+
+    @Value("${s3BucketName}")
+    String s3BucketName;
+
     private String imageUpload(MultipartFile file) throws IOException{
         String key = "search_user/" + "07March2024" + "-" + file.getOriginalFilename();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
 
-        amazonS3.putObject(new PutObjectRequest("cloud-media-upload-1", key, file.getInputStream(), metadata)
+        amazonS3.putObject(new PutObjectRequest(s3BucketName, key, file.getInputStream(), metadata)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        String imageUrl = amazonS3.getUrl("cloud-media-upload-1", key).toString();
+        String imageUrl = amazonS3.getUrl(s3BucketName, key).toString();
         System.out.println(imageUrl);
         return key;
     }
     @Override
     public UserSearchDTO searchUser(MultipartFile file) throws IOException {
         String imageKey = imageUpload(file);
-        return lambdaFunction.searchUser("cloud-media-upload-1",imageKey,"ashishnagpal-collection");
+        return lambdaFunction.searchUser(s3BucketName,imageKey,"ashishnagpal-collection");
     }
 
     @Override
@@ -46,10 +51,10 @@ public class ImageServiceImpl implements ImageService {
             for (MultipartFile file : files) {
                 String key = "images/" + "ash/" + file.getOriginalFilename();
 
-                amazonS3.putObject(new PutObjectRequest("cloud-media-upload-1", key, file.getInputStream(), null)
+                amazonS3.putObject(new PutObjectRequest(s3BucketName, key, file.getInputStream(), null)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             }
-            String collectionName = lambdaFunction.createCollectionIndexes("ashishnagpal","cloud-media-upload-1", "images/ash/");
+            String collectionName = lambdaFunction.createCollectionIndexes("ashishnagpal",s3BucketName, "images/ash/");
             System.out.println(collectionName);
             return collectionName;
         } catch (Exception e) {

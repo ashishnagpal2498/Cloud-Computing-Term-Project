@@ -35,7 +35,8 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     private AmazonDynamoDB amazonDynamoDB;
 
-    private final String dynamoDbTableName = "user-images";
+    @Value("${dynamoDBTableName}")
+    private String dynamoDbTableName;
 
     @Override
     public List<String> getFriendsList(){
