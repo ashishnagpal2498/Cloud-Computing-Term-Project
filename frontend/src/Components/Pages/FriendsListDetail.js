@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import { green, red, yellow } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
+import { backendURL } from '../../config';
 
 const FriendsListDetail = () => {
   const [friends, setFriends] = useState([]);
@@ -20,7 +21,7 @@ const FriendsListDetail = () => {
   const fetchFriends = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:8080/friends-list/get-friends/${listName}`);
+      const response = await axios.get(`http://${backendURL}:8080/friends-list/get-friends/${listName}`);
       setFriends(response.data);
       setLoading(false);
     } catch (error) {
@@ -53,7 +54,7 @@ const FriendsListDetail = () => {
   const handleAddEmails = async () => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8080/friends-list/add-friends', {
+      const response = await axios.post(`http://${backendURL}:8080/friends-list/add-friends`, {
         snsTopicName: `${listName}`,
         emailAddresses: newEmails.filter(email => email.trim() !== '')
       });
@@ -75,7 +76,7 @@ const FriendsListDetail = () => {
   const handleDeleteEmail = async (subscriptionArn) => {
     try {
       setLoading(true);
-      await axios.delete('http://localhost:8080/friends-list/friend', {
+      await axios.delete(`http://${backendURL}:8080/friends-list/friend`, {
         data: {
           subscriptionArn: subscriptionArn
         }
@@ -94,7 +95,7 @@ const FriendsListDetail = () => {
   const handleResendConfirmation = async (email) => {
     try {
       setLoading(true);
-      await axios.post('http://localhost:8080/friends-list/resendConfirmation', {
+      await axios.post(`http://${backendURL}:8080/friends-list/resendConfirmation`, {
         emailAddresses: [email],
         snsTopicName: listName
       });

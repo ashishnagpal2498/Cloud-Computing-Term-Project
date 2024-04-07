@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Button, CircularProgress, Typography, Snackbar, Grid, List, ListItem, ListItemText } from '@mui/material';
 import { Alert } from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { backendURL } from '../../config';
 
 const DropBox = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({
@@ -34,9 +35,9 @@ const ViewImages = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/collections/${collectionName}`);
+        console.log("useEffect")
+        const response = await axios.get(`http://${backendURL}:8080/collections/${collectionName}`);
         if (response.status === 200) {
-          setImages(response.data);
           setLoading(false);
         }
       } catch (error) {
@@ -63,11 +64,12 @@ const ViewImages = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8080/searchImage', formData, {
+      const response = await axios.post(`http://${backendURL}:8080/searchImage`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log("Response -->", response.data)
       if (response.status === 200) {
         
         setImages(response.data.images);
@@ -103,7 +105,7 @@ const ViewImages = () => {
       <Typography variant="h4" gutterBottom>View your Images</Typography>
 
       { error && <Alert severity= 'error' > {error} </Alert> }
-      { images.length > 0 && <Button variant="contained" startIcon={<CloudDownloadIcon />} onClick={handleDownloadAll}>Download All</Button> }
+      { images?.length > 0 && <Button variant="contained" startIcon={<CloudDownloadIcon />} onClick={handleDownloadAll}>Download All</Button> }
       <DropBox onDrop={onDrop} />
       
       {image && (
@@ -116,7 +118,7 @@ const ViewImages = () => {
           </List>
         </>
       )}
-      {images.length > 0 && (
+      {images?.length > 0 && (
         <div className="image-grid">
           <Typography variant="h6" gutterBottom>Images</Typography>
           <Grid container spacing={3}>
@@ -129,7 +131,7 @@ const ViewImages = () => {
         </div>
       )}
       <Button variant="contained" onClick={searchFace}>Search Pictures</Button>
-     
+      {images === null && <h3> No Images present in Album</h3>}
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={() => setSnackbarOpen(false)}>
         <Alert severity="info" onClose={() => setSnackbarOpen(false)}>Download of all images has started</Alert>
       </Snackbar>

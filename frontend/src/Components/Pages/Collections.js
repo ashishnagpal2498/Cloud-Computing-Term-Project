@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, CircularProgress } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
+import { backendURL } from '../../config';
+import { Link } from 'react-router-dom';
 
 const Collections = () => {
   const [collectionList, setCollectionList] = useState([]);
@@ -18,7 +20,7 @@ const Collections = () => {
   useEffect(() => {
     const fetchCollections = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/collections');
+        const response = await axios.get(`http://${backendURL}:8080/collections`);
         setCollectionList(response.data);
         console.log(response.data)
         setLoadingCollections(false);
@@ -30,7 +32,7 @@ const Collections = () => {
 
     const fetchFriendsList = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/friends-list/');
+        const response = await axios.get(`http://${backendURL}:8080/friends-list/`);
         setFriendsList(response.data);
         setLoadingFriends(false);
       } catch (error) {
@@ -55,7 +57,7 @@ const Collections = () => {
   const handleShare = async () => {
     try {
       setUploading(true); // Show loader
-      await axios.post('http://localhost:8080/friends-list/publishMessage', {
+      await axios.post(`http://${backendURL}:8080/friends-list/publishMessage`, {
         collectionId: selectedCollection,
         snsTopicName: selectedList
       });
@@ -82,6 +84,7 @@ const Collections = () => {
         {collectionList.map((collection, index) => (
           <ListItem key={index}>
             <ListItemText primary={collection} />
+            <Button variant='outlined' style={{marginRight: "7px"}}><Link to={"/view/" + collection} >View Collection</Link> </Button>
             <Button onClick={() => handleShareDialogOpen(collection)} startIcon={<ShareIcon />} variant="outlined">Share</Button>
           </ListItem>
         ))}

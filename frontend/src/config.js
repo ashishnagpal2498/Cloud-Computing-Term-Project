@@ -1,0 +1,2 @@
+export const frontendUrl = process.env.REACT_APP_ENVIRONMENT === 'production' ?  process.env.REACT_APP_FRONTEND_URL : "localhost";
+export const backendURL = process.env.REACT_APP_ENVIRONMENT === 'production' ?  process.env.REACT_APP_BACKEND_URL : "localhost";

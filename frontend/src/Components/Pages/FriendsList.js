@@ -5,7 +5,8 @@ import { Button, TextField, List, ListItem, ListItemText, IconButton, Snackbar, 
 import { Alert } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { green, red, yellow } from '@mui/material/colors';
+import { green, red } from '@mui/material/colors';
+import { backendURL } from '../../config';
 
 const FriendsList = () => {
   const [listTitles, setListTitles] = useState([]);
@@ -16,14 +17,18 @@ const FriendsList = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const fetchListTitles = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/friends-list/');
+      console.log("Calling fetchListTiles =====> ")
+      const response = await axios.get(`http://${backendURL}:8080/friends-list/`);
+      console.log(response);
       setListTitles(response.data);
     } catch (error) {
+      console.log(error);
       setError('Error fetching list titles');
     }
   };
   useEffect(() => {
 
+    console.log("Use-Effect-FriendsList");
 
     fetchListTitles();
   }, []);
@@ -48,7 +53,7 @@ const FriendsList = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8080/friends-list/create', {
+      const response = await axios.post(`http://${backendURL}:8080/friends-list/create`, {
         snsTopicName: newListTitle,
         emailAddresses: emailAddresses.filter(email => email.trim() !== '')
       });
@@ -64,7 +69,7 @@ const FriendsList = () => {
   };
   const handleDeleteList = async (title) => {
     try {
-      await axios.delete(`http://localhost:8080/friends-list/${title}`);
+      await axios.delete(`http://${backendURL}:8080/friends-list/${title}`);
       setListTitles(listTitles.filter(item => item !== title));
     } catch (error) {
       setError('Error deleting list');

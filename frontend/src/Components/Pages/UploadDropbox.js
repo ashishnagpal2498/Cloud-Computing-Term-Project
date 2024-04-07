@@ -5,6 +5,7 @@ import ImageGallery from '../Layouts/Image-Gallery/ImageGallery';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import '../../Stylesheets/dropbox.css'; // Add your custom CSS for styling
+import { backendURL } from '../../config';
 
 const DropBox = ({ onDrop }) => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
@@ -44,7 +45,7 @@ const UploadDropBox = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:8080/uploadBulk', formData, {
+      const response = await axios.post(`http://${backendURL}:8080/uploadBulk`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -64,7 +65,7 @@ const UploadDropBox = () => {
 
   const fetchFriendsList = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/friends-list/');
+      const response = await axios.get(`http://${backendURL}:8080/friends-list/`);
       setFriendsList(response.data);
     } catch (error) {
       console.error('Error fetching friends list:', error);
@@ -77,7 +78,7 @@ const UploadDropBox = () => {
 
   const handleShare = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/friends-list/publishMessage', {
+      const response = await axios.post(`http://${backendURL}:8080/friends-list/publishMessage`, {
         collectionId,
         snsTopicName: selectedList
       });
