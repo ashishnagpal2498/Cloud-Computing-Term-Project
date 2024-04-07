@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda Function Stack to create Search and Create Collection Lambda function
+
+Resources:
+  SearchFacesLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: searchFace
+      Handler: searchFaces.lambda_handler
+      Role: arn:aws:iam::992382575885:role/LabRole
+      Code:
+        S3Bucket: "imagicon-files"
+        S3Key: "lambda/lambda-code.zip"
+      Runtime: python3.12
+      Timeout: 25
+      TracingConfig:
+        Mode: Active
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-09c9e04d33d8592c0
+        SubnetIds:
+          - subnet-0e8e712fe86940ee8
+          - subnet-07a67200a06be9783
+
+  CreateCollectionLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: create_collection
+      Handler: createCollection.lambda_handler
+      Role: arn:aws:iam::992382575885:role/LabRole
+      Code:
+        S3Bucket: "imagicon-files"
+        S3Key: "lambda/lambda-code.zip"
+      Runtime: python3.12
+      Timeout: 25
+      TracingConfig:
+        Mode: Active
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-09c9e04d33d8592c0
+        SubnetIds:
+          - subnet-0e8e712fe86940ee8
+          - subnet-07a67200a06be9783

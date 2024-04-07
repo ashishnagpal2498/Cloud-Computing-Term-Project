@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources: 
+  myDynamoDBTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "username"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "username"
+          KeyType: "HASH"
+          
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "user-images"
+
+
+# AWSTemplateFormatVersion: "2010-09-09"
+# Resources: 
+#   myDynamoDBTable: 
+#     Type: AWS::DynamoDB::Table
+#     Properties: 
+#       AttributeDefinitions: 
+#         - 
+#           AttributeName: "username"
+#           AttributeType: "S"
+#         - 
+#           AttributeName: "rekognitionCollectionId"
+#           AttributeType: "S"
+#         - 
+#           AttributeName: "friendsList"
+#           AttributeType: "L"
+#       KeySchema: 
+#         - 
+#           AttributeName: "username"
+#           KeyType: "HASH"
+          
+#       ProvisionedThroughput: 
+#         ReadCapacityUnits: "5"
+#         WriteCapacityUnits: "5"
+#       TableName: "user-images-1"

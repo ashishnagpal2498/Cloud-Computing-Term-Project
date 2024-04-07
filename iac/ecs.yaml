@@ -1,0 +1,298 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: The template used to create an ECS Service
+
+Parameters:
+  ECSClusterName:
+    Type: String
+    Default: imagicon-cluster-cfn
+  ECSServiceName:
+    Type: String
+    Default: imagicon-backend
+  PublicSubnetIDs:
+    Type: CommaDelimitedList
+    Default: "subnet-0cbab670ef7968a33,subnet-0b8fb420cddda6582"
+  PrivateSubnetIDs:
+    Type: CommaDelimitedList
+    Default: "subnet-0e8e712fe86940ee8,subnet-07a67200a06be9783"
+  VpcID:
+    Type: String
+    Default: "vpc-012411f74b2dcaaa3" # VPC Created via CFN
+  LoadBalancerName:
+    Type: String
+    Default: "imagicon-lb-cfn"
+  FrontendECRImage:
+    Type: String
+    Default: "992382575885.dkr.ecr.us-east-1.amazonaws.com/imagicon-frontend:latest"
+  BackendECRImage:
+    Type: String
+    Default: 992382575885.dkr.ecr.us-east-1.amazonaws.com/imagicon-backend
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ECSClusterName
+  TaskdefinitionFrontend: 
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      NetworkMode: awsvpc 
+      Family: "imagicon-frontend-cfn"
+      TaskRoleArn: "arn:aws:iam::992382575885:role/LabRole"
+      ExecutionRoleArn: "arn:aws:iam::992382575885:role/LabRole"
+      RequiresCompatibilities: 
+        - FARGATE
+        - EC2
+      Cpu: 1024
+      Memory: 2048
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+      ContainerDefinitions: 
+        - 
+          Name: "imagicon-frontend-container-cfn"
+          Image: !Ref FrontendECRImage  #Frontend- Image
+          Cpu: 512
+          PortMappings: 
+            - 
+              ContainerPort: 3000
+              HostPort: 3000
+          Memory: 1024
+          Essential: true
+          Environment:
+            -
+              Name: "REACT_APP_ENVIRONMENT"
+              Value: "production"
+            -
+              Name: "REACT_APP_FRONTEND_URL"
+              Value: "localhost"
+            -
+              Name: "REACT_APP_BACKEND_URL"
+              Value: !GetAtt LoadBalancerECS.DNSName 
+
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-create-group: "true"
+              awslogs-group: "/ecs/imagicon-cfn"
+              awslogs-region: "us-east-1"
+              awslogs-stream-prefix: "ecs/imagicon-frontend"
+
+  TaskdefinitionBackend: 
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      NetworkMode: awsvpc 
+      Family: "imagicon-backend-cfn"
+      TaskRoleArn: "arn:aws:iam::992382575885:role/LabRole"
+      ExecutionRoleArn: "arn:aws:iam::992382575885:role/LabRole"
+      RequiresCompatibilities: 
+        - FARGATE
+        - EC2
+      Cpu: 1024
+      Memory: 2048
+      RuntimePlatform:
+        CpuArchitecture: X86_64
+        OperatingSystemFamily: LINUX
+      ContainerDefinitions: 
+        - 
+          Name: "imagicon-backend-container-cfn"
+          Image: !Ref BackendECRImage
+          Cpu: 512
+          PortMappings: 
+            - 
+              ContainerPort: 8080
+              HostPort: 8080
+          Memory: 1024
+          Essential: true
+          Environment:
+            -
+              Name: "FRONTEND_URL"
+              Value: !GetAtt LoadBalancerECS.DNSName 
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-create-group: "true"
+              awslogs-group: "/ecs/imagicon-cfn"
+              awslogs-region: "us-east-1"
+              awslogs-stream-prefix: "ecs/imagicon-backend"
+
+  LoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+
+  ECSSGBackend:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow request from loadbalancer
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          SourceSecurityGroupId: !GetAtt LoadBalancerSG.GroupId
+
+  ECSSGFrontend:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow request from loadbalancer
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !GetAtt LoadBalancerSG.GroupId
+
+  ECSServiceFrontend:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Ref ECSCluster
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 0
+          Weight: 1
+      TaskDefinition: !Ref TaskdefinitionFrontend
+      ServiceName: imagicon-frontend
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: imagicon-frontend-container-cfn
+          ContainerPort: 3000
+          TargetGroupArn: !Ref FrontendTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: 
+            - !Ref ECSSGFrontend
+          Subnets: !Ref PrivateSubnetIDs
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      EnableECSManagedTags: true
+    DependsOn:
+      - FrontendLisenter
+
+
+  ECSServiceBackend:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: !Ref ECSCluster
+      CapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Base: 0
+          Weight: 1
+      TaskDefinition: !Ref TaskdefinitionBackend
+      ServiceName: imagicon-backend
+      SchedulingStrategy: REPLICA
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: imagicon-backend-container-cfn
+          ContainerPort: 8080
+          TargetGroupArn: !Ref BackendTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: 
+            - !Ref ECSSGBackend
+          Subnets: !Ref PrivateSubnetIDs
+      PlatformVersion: LATEST
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+        DeploymentCircuitBreaker:
+          Enable: true
+          Rollback: true
+      DeploymentController:
+        Type: ECS
+      ServiceConnectConfiguration:
+        Enabled: false
+      Tags: []
+      EnableECSManagedTags: true
+    DependsOn:
+      - BackendLisenter
+
+  LoadBalancerECS:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Type: application
+      Name: !Ref LoadBalancerName
+      SecurityGroups: 
+        - !Ref LoadBalancerSG
+      Subnets: !Ref PublicSubnetIDs
+
+  BackendLisenter:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref BackendTargetGroup
+      LoadBalancerArn: !Ref LoadBalancerECS
+      Port: '8080'
+      Protocol: HTTP
+
+  FrontendLisenter:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref FrontendTargetGroup
+      LoadBalancerArn: !Ref LoadBalancerECS
+      Port: '80'
+      Protocol: HTTP
+
+  FrontendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${ECSClusterName}-Frontend-1
+      VpcId: !Ref VpcID
+      Port: 3000
+      Protocol: HTTP
+      TargetType: ip
+
+  BackendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${ECSClusterName}-backend
+      VpcId: !Ref VpcID
+      Port: 8080
+      Protocol: HTTP
+      TargetType: ip
+
+
+Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !Ref ECSClusterName
+  ECSServiceBackend:
+    Description: The created service.
+    Value: !Ref ECSServiceBackend
+  ECSServiceFrontend:
+    Description: The created service.
+    Value: !Ref ECSServiceFrontend
+  LoadBalancer:
+    Description: The created load balancer.
+    Value: !Ref LoadBalancerECS
+  LoadBalancerDNS:
+    Description: Domain Name of Load Balancer
+    Value: !GetAtt LoadBalancerECS.DNSName
+  BackendLisenter:
+    Description: The created listener.
+    Value: !Ref BackendLisenter
