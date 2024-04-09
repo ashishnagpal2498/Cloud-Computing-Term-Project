@@ -1,0 +1,35 @@
+You know the previous history of this conversion. Let me explain you in more detail.
+The above conversation is basically my Springboot Application server ( Name of Application - Imagicon ) which communicates with lambda function and rekognition API and respond to Client request. ( Imagicon Frontend - Built on ReactJs)
+
+Controllers and associated API
+1. ImageController
+    a. /uploadBulk - This API accepts multipart file upload as an input and calls the S3 bucket to upload the files. Next, it also Invokes the create_collection lambda function 
+     The lambda function will create the rekognition collection and add faces to the collection by reading the images from S3 bucket and add an entry for the user in DynamoDB table
+   b. /searchImage - This API accept a single multipart file which is an image and calls the searchFaces lambda function.
+       The lambda function will take the image from S3 and calls the searchFaces API of rekognition and return the faces which are matched.
+       The API then returns the S3 URL of the faces matched by using the externalImageId attribute in rekognition
+
+2. FriendListController - /friends-list
+    a. / - This will return the ARNs of the SNS Topics which are added in the DynamoDB table as value FriendsList
+    b. /create - This will create the SNS topic and the subscriptions of Emails sent by the client
+    c. /add-friends or /resendConfirmation - This will add more subscriptions to same Friends list
+    d. /get-friends/{topicName} - Get all the subscriptions present in that SNS topic
+    e. /publishMessage - Publish message to an SNS topic -->
+    f. Delete - /{topicName} - This will delete the entire friendList i.e the SNS topic and also the entry in DynamoDB table
+    g. Delete - /friend - Delete the subscription
+
+3. ViewImageController
+    a. ("/collections/{collectionName}") - It tells whether the rekognition collection exist or not by calling the DynamoDB table and checking if the entry is present in it.
+
+I have used ECS cluster with Fargate to Deploy this springboot application which is in private subnet and exposed via Load Balancer. The docker image is stored in ECR repository. 
+
+I want to provide a comparison of alternative services available (AWS EC2, AWS Elastic Beanstalk, Docker & AWS Elastic Beanstalk, Step-functions), explaining why I chose the services in my system over the alternatives. Basically I want to praise the usage of ECS-Fargate option. Following is a sample answer of choosing EC2 over other services :-
+==============
+Scalability: Given that my AutoHub service includes the ability to upload pictures and that the number of users may increase at any time, I chose EC2 because it dynamically scales up and down according to demand.
+Flexibility: The virtual server can be configured using one of the several instance types offered by EC2, such as t2.micro, t2.large, etc., depending on our performance needs and financial constraints. For my AutoHub application as the memory requirement is more, t2.large has 4 times the memory that t2.micro provides and also twice the computing abilities.
+Reliability: The built-in redundancy and failover features of an EC2 instance would benefit my application by making it highly available.
+Security: Several options are provided by EC2 to protect our application from unauthorized access. To control who can send requests to my AutoHub application, I use security groups for inbound traffic filtering.
+Cost: Because EC2 is a pay-as-you-go approach, meaning we only pay for what we use, it would be the most cost-effective solution for AutoHub given the fluctuating traffic to the application.
+===========
+
+Can you provide me the above answer for ECS taking the reference of sample answer ?

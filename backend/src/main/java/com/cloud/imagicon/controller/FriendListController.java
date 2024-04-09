@@ -59,8 +59,6 @@ public class FriendListController {
     @DeleteMapping("/{topicName}")
     public String deleteTopicAndRemoveFromTable(@PathVariable String topicName) {
         // Delete the SNS topic
-// Replace with your topic ARN
-
         // Remove the topic ARN from the DynamoDB table
         snsService.removeFriendList(topicName);
 
