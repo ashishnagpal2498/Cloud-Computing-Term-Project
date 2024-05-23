@@ -22,8 +22,8 @@ export const Navigation = () => {
               
             </ul>
             <ul className="menu menu-auth">
-              {/* <li><a href="/login">Login</a></li>
-              <li><a href="/signup">SignUp</a></li> */}
+              <li><a href="https://springboot-trial.auth.us-east-1.amazoncognito.com/login?client_id=4rn99o5sdjhpann7ajk90e9mm7&response_type=code&scope=email+openid+profile&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F">Login</a></li>
+              <li><a href="https://springboot-trial.auth.us-east-1.amazoncognito.com/signup?client_id=4rn99o5sdjhpann7ajk90e9mm7&response_type=code&scope=email+openid+profile&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F">SignUp</a></li>
             </ul>
             <button className={`cross-btn ${menuOpen ? 'open' : ''}`} onClick={toggleMenu}>&#x2715;</button>
           </div>
