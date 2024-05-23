@@ -80,14 +80,14 @@ Parameters:
 
   FrontendECRImage:
     Type: String
-    Default: "992382575885.dkr.ecr.us-east-1.amazonaws.com/imagicon-frontend:latest"
+    Default: "821284407379.dkr.ecr.us-east-1.amazonaws.com/imagicon-frontend:latest"
   BackendECRImage:
     Type: String
-    Default: "992382575885.dkr.ecr.us-east-1.amazonaws.com/imagicon-backend:latest"
+    Default: "821284407379.dkr.ecr.us-east-1.amazonaws.com/imagicon-backend:latest"
 
   LabRoleARN:
     Type: String
-    Default: "arn:aws:iam::992382575885:role/LabRole"
+    Default: "arn:aws:iam::821284407379:role/LabRole"
     Description: Role which is assumed by the services
 
 
